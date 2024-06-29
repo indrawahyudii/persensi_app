@@ -2,9 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:presensi_app/screen/dashboard_screen.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -162,6 +159,7 @@ class _LoginScreen extends State<LoginScreen> {
                     const SizedBox(height: 8),
 
 //forgot password
+
                     GestureDetector(
                       onTap: () {
                         if (kDebugMode) {
