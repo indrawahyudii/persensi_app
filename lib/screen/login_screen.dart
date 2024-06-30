@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:presensi_app/screen/dashboard_screen.dart';
@@ -46,13 +47,20 @@ class _LoginScreen extends State<LoginScreen> {
         'password': password,
       }),
     );
-
+    if (kDebugMode) {
+      print(response.statusCode);
+    }
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       final token = responseBody['token'];
-
+      final name = responseBody['nama'];
+      final dept = responseBody['departemen'];
+      final imgUrl = responseBody['imgUrl'];
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('jwt', token);
+      await prefs.setString('name', name);
+      await prefs.setString('dept', dept);
+      await prefs.setString('imgProfil', imgUrl);
 
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const DashboardScreen()),
