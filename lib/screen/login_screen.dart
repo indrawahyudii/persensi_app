@@ -1,7 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:presensi_app/screen/dashboard_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,7 +25,8 @@ class _LoginScreen extends State<LoginScreen> {
 
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter your username and password')),
+        const SnackBar(
+            content: Text('Please enter your username and password')),
       );
       return;
     }
@@ -32,8 +35,7 @@ class _LoginScreen extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    const url =
-        'https://presensi.spilme.id/login'; // Replace with your server address
+    const url = 'https://presensi.spilme.id/login';
     final response = await http.post(
       Uri.parse(url),
       headers: {
@@ -44,6 +46,7 @@ class _LoginScreen extends State<LoginScreen> {
         'password': password,
       }),
     );
+
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       final token = responseBody['token'];
@@ -57,7 +60,7 @@ class _LoginScreen extends State<LoginScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Invalid username or password')),
+        const SnackBar(content: Text('Invalid username or password')),
       );
     }
 
@@ -69,49 +72,44 @@ class _LoginScreen extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 211, 201, 201),
-        body: SafeArea(
-            child: SingleChildScrollView(
+      backgroundColor: const Color.fromARGB(255, 211, 201, 201),
+      body: SafeArea(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
-              const SizedBox(
-                height: 80,
-              ),
+              const SizedBox(height: 80),
               Center(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    //Logo aplikasi
+                    // Logo aplikasi
                     Image.asset(
                       'assets/images/logo_polbeng.png',
                       height: 128,
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    const SizedBox(height: 10),
                     RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(
-                          text: 'Selamat Datang Di ',
-                          style: GoogleFonts.manrope(
-                            fontSize: 32,
-                            color: const Color(0xFF101317),
-                            fontWeight: FontWeight.w800,
+                        text: 'Selamat Datang Di ',
+                        style: GoogleFonts.manrope(
+                          fontSize: 32,
+                          color: const Color(0xFF101317),
+                          fontWeight: FontWeight.w800,
+                        ),
+                        children: const [
+                          TextSpan(
+                            text: 'PresensiApp',
+                            style: TextStyle(
+                              color: Color(0xFF12A3DA),
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                          children: const [
-                            TextSpan(
-                                text: 'PresensiApp',
-                                style: TextStyle(
-                                    color: Color(0xFF12A3DA),
-                                    fontWeight: FontWeight.w800))
-                          ]),
+                        ],
+                      ),
                     ),
-
-// kodingan untuk ('Halo, silahkan masuk untuk melanjutkan')
-                    const SizedBox(
-                      height: 5,
-                    ),
+                    const SizedBox(height: 5),
                     Text(
                       'Halo, silahkan masuk untuk melanjutkan',
                       style: GoogleFonts.manrope(
@@ -119,13 +117,10 @@ class _LoginScreen extends State<LoginScreen> {
                         color: const Color.fromARGB(255, 57, 111, 219),
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-// kodingan untuk ('User name')
-                    const TextField(
-                      decoration: InputDecoration(
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: _usernameController,
+                      decoration: const InputDecoration(
                         labelText: 'Username',
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -139,10 +134,9 @@ class _LoginScreen extends State<LoginScreen> {
                       keyboardType: TextInputType.emailAddress,
                     ),
                     const SizedBox(height: 24),
-
-// Password TextField
-                    const TextField(
-                      decoration: InputDecoration(
+                    TextField(
+                      controller: _passwordController,
+                      decoration: const InputDecoration(
                         labelText: 'Password',
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -157,14 +151,9 @@ class _LoginScreen extends State<LoginScreen> {
                       obscureText: true,
                     ),
                     const SizedBox(height: 8),
-
-//forgot password
-
                     GestureDetector(
                       onTap: () {
-                        if (kDebugMode) {
-                          print('lupa password tapped');
-                        }
+                        // Handle forgot password
                       },
                       child: Align(
                         alignment: Alignment.centerRight,
@@ -177,27 +166,17 @@ class _LoginScreen extends State<LoginScreen> {
                         ),
                       ),
                     ),
-
-// kodingan untuk (login => 'Masuk')
                     const SizedBox(height: 20),
-                    // Login Button
                     ElevatedButton(
-                      onPressed: () {
-                        // Login Tap
-                        Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder: (context) => const DashboardScreen(),
-                            ),
-                            (route) => false);
-                      },
+                      onPressed: _login,
                       style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(
-                              double.infinity, 50), // width and height
-                          backgroundColor: const Color(0xFF12A3DA),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )),
+                        minimumSize: const Size(double.infinity, 50),
+                        backgroundColor: const Color(0xFF12A3DA),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                       child: Text(
                         'Masuk',
                         style: GoogleFonts.manrope(
@@ -205,7 +184,6 @@ class _LoginScreen extends State<LoginScreen> {
                         ),
                       ),
                     ),
-//untuk kodingan masuk dengan sidik jari
                     const SizedBox(height: 16),
                     Text(
                       'Masuk dengan sidik jari?',
@@ -214,25 +192,21 @@ class _LoginScreen extends State<LoginScreen> {
                         color: const Color(0xFF101317),
                       ),
                     ),
-
                     const SizedBox(height: 16),
                     TextButton(
                       onPressed: () {
-                        // Fingerprint Tap (sidik jari)
+                        // Handle fingerprint login
                       },
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.fingerprint, size: 49, color: Colors.grey),
-                        ],
+                      child: const Icon(
+                        Icons.fingerprint,
+                        size: 49,
+                        color: Colors.grey,
                       ),
                     ),
                     const SizedBox(height: 16),
-
-// Register New Account (daftar akun )
                     GestureDetector(
                       onTap: () {
-                        // Register Tap
+                        // Handle register new account
                       },
                       child: RichText(
                         text: TextSpan(
@@ -255,9 +229,11 @@ class _LoginScreen extends State<LoginScreen> {
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
-        )));
+        ),
+      ),
+    );
   }
 }
