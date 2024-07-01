@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:presensi_app/model/presensi.dart';
 import 'package:presensi_app/screen/attandance_recap_screen.dart';
+import 'package:presensi_app/screen/log_activity_screen/logs_home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -461,3 +462,50 @@ String getPresenceExitStatus(String jamKeluar) {
   // Implementasikan logika status kehadiran keluar sesuai kebutuhan
   return 'Left Early'; // Contoh pengembalian status
 }
+               ),
+                      ),
+                    ),
+                  ),
+                  ),      
+                ],
+              ),
+
+            const SizedBox(height:10,),
+              ElevatedButton(
+                    onPressed: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>  LogsActivityScreen(nik:nik,token:token),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 50), // width and height
+                      backgroundColor: const Color(0xFF12A3DA),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      )
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min, // Use min to prevent the Row from expanding
+                      children: [
+                        const Icon(
+                          Icons.note_add_outlined, // This is the icon you want before the text
+                          color: Colors.white, // Icon color
+                          size: 24.0, // Icon size
+                        ),
+                        const SizedBox(width: 8), // Spacing between icon and text
+                        Text(
+                          'Isi Log Aktifitas',
+                          style: GoogleFonts.manrope(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
+                    ),
+                  ), 
+            ],
+          ),
+        )
